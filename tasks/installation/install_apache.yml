@@ -1,0 +1,23 @@
+#-----------------------------------------------------------------------------------------
+#-----------                 Include for Apache installation             -----------------
+#-----------------------------------------------------------------------------------------
+
+- name: Install the latest version of Apache
+  ansible.builtin.dnf:
+    name: httpd
+    state: latest
+
+- name: Copy configuration file
+  shell: "/usr/local/bin/aws s3 cp {{ s3_bucket }}/Cognos-src/ConfigFiles/{{ item }} /etc/httpd/"
+  with_items:
+    - cognos.conf
+
+- name: Enable service httpd
+  ansible.builtin.service:
+    name: httpd
+    enabled: yes
+
+- name: Start service httpd, if not started
+  ansible.builtin.service:
+    name: httpd
+    state: started

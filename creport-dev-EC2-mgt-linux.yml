@@ -1,0 +1,34 @@
+- name: Playbook to apply templates
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    - inst_user: "cog117as"
+    - super_user: "root"
+    - aws_region: "eu-west-1"
+    - env: "dev"
+    - s3_bucket: "s3://creport-{{ env }}-s3-mgt/last"
+
+  tasks:
+    - name: Play for testing scripts before move them to final files
+      ansible.builtin.command: echo "Hello"
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    # # Add swap memory and activate it
+    # - include_tasks: tasks/ec2_setup/create_swap_memory.yml
+    #   vars:
+    #     swap_size: 2
+
+    # # Create installation user
+    # - include_tasks: tasks/users/create_user.yml
+    #   vars:
+    #     username: "{{ inst_user }}"
+
+    # - ansible.builtin.include_tasks: tasks/installation/install_apache.yml
+    - ansible.builtin.include_tasks: tasks/installation/install_oracle_client.yml
+      vars:
+        - root_folder: "/opt"
+        - app_folder: "{{ root_folder }}/appl"
+        - sources_folder: "{{ app_folder }}/sources"        
+        - oracle_folder: "{{ app_folder }}/oraclecl"
